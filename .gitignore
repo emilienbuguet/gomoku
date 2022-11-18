@@ -154,3 +154,6 @@ cython_debug/
 
 # Piskvork test folder
 piskvork/
+
+# Fleet config folder
+.fleet/
