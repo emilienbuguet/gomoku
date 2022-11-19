@@ -10,7 +10,7 @@ def main():
         core = Core()
         core.start()
     except KeyboardInterrupt:
-        print("Shutting down...")
+        return 0
 
 
 if __name__ == '__main__':

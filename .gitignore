@@ -157,3 +157,6 @@ piskvork/
 
 # Fleet config folder
 .fleet/
+
+# Windows executable
+pbrain-gomoku-ai.exe

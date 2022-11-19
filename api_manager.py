@@ -1,6 +1,6 @@
 """This is the file where the class that communicates with the Piskvork api is implemented."""
 from sys import stdin
-from enum import Enum, auto
+from enum import Enum
 
 ApiCommands = Enum('ApiCommands', ['START', 'TURN', 'BEGIN', 'BOARD', 'INFO', 'END', 'ABOUT'])
 BrainCommands = Enum('BrainCommands', ['UNKNOWN', 'ERROR', 'MESSAGE', 'DEBUG', 'SUGGEST'])
@@ -34,4 +34,9 @@ class ApiManager:
             print('DEBUG Invalid brain command: "%s"' % cmd)
             return
         message = "%s %s" % (cmd.name, message)
+        print(message, flush=True)
+
+    @staticmethod
+    def answer(message: str):
+        """Answers to an api command"""
         print(message, flush=True)
