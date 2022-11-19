@@ -6,8 +6,11 @@ from core import Core
 
 
 def main():
-    core = Core()
-    core.start()
+    try:
+        core = Core()
+        core.start()
+    except KeyboardInterrupt:
+        print("Shutting down...")
 
 
 if __name__ == '__main__':
