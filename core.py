@@ -34,6 +34,18 @@ class Core:
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for START")
             return None
 
+    def __handle_board__(self) -> str:
+        """Handles the BOARD command"""
+        lines: list = list()
+        while 1:
+            line = self.__manager__.receive()
+            if line == 'DONE':
+                break
+            lines.append(line)
+        self.__game__.load_board(lines)
+
+
+
     def __handle_begin__(self) -> str:
         """Handles the BEGIN command"""
         x, y = brain.evaluate(self.__game__)
@@ -69,6 +81,8 @@ class Core:
             return self.__handle_about__()
         if cmd == ApiCommands.START:
             return self.__handle_start__(params)
+        if cmd == ApiCommands.BOARD:
+            return self.__handle_board__()
         if cmd == ApiCommands.BEGIN:
             return self.__handle_begin__()
         if cmd == ApiCommands.TURN:
@@ -84,7 +98,7 @@ class Core:
         while not self.__shutdown__:
             line: str = self.__manager__.receive()
             cmd: str = line.split(' ')[0]
-            params: list[str] = ''.join(line.split(' ')[1:]).split(',')
+            params: list = ''.join(line.split(' ')[1:]).split(',')
 
             if cmd not in [c.name for c in list(ApiCommands)]:
                 self.__manager__.send(BrainCommands.UNKNOWN, message='api command "%s" is not supported.' % cmd)

@@ -8,7 +8,7 @@ class Board:
     def __init__(self, length: int, height: int):
         self.length = int(length)
         self.height = int(height)
-        self.stones = [[0 for i in range(0, self.length)] for n in range(0, self.height)]
+        self.stones = [[0 for _ in range(0, self.length)] for _ in range(0, self.height)]
 
     def __str__(self) -> str:
         result: str = ''
@@ -24,11 +24,14 @@ class Board:
 
         [X],[Y],[field] where field is 1 (own stone) or 2 (opponent's stone)
         """
-        self.length = len(list[0])
-        self.height = len(list)
-        return board
+        self.length = len(lines[0])
+        self.height = len(lines)
+        for line in lines:
+            [x, y, value] = list(map(int, line.split(',')))
+            self.stones[x][y] = value
 
     def add_stone(self, value: int, x: int, y: int):
+        """Adds a stone to the board"""
         if x < 0 or x >= self.length or y < 0 or y >= self.height:
             raise ValueError("Out of bounds: (%d, %d)" % (x, y))
         self.stones[y][x] = value
@@ -44,8 +47,8 @@ class Game:
         """Creates an empty board of length x and height y"""
         self.board = Board(length, height)
 
-    def load_board(self, list):
-        self.board = self.board.load(list)
+    def load_board(self, lines: list):
+        self.board.load(lines)
 
     def new_turn(self, player: Players, x, y):
-        self.board.add_stone(player.value, x, y)
+        self.board.add_stone(player.value(), x, y)
