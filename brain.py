@@ -27,14 +27,20 @@ def run_one_random_game(board: Board):
         player = Players['ME'] if player == Players['ENNEMY'] else Players['ENNEMY']
 
 
-def run_random_games(nb_games: int, board: Board) -> int: # todo opti with number of looses
+def run_random_games(nb_games: int, board: Board, record: int) -> int:
     victories = 0
+    looses = 0
 
     for i in range(nb_games):
         copied_board = deepcopy(board)
         run_one_random_game(copied_board)
         if has_won(copied_board, Players['ME']):
             victories += 1
+        else:
+            looses += 1
+
+        if nb_games - record < looses:
+            return victories
 
     return victories
 
@@ -51,7 +57,7 @@ def monte_carlo(game: Game) -> (int, int):
     for (x, y) in possible_hits:
         board = deepcopy(game.board)
         board.add_stone(Players['ME'], x, y)
-        victories = run_random_games(50, board)
+        victories = run_random_games(50, board, winner['score'])
         if victories > winner['score']:
             winner = {'x': x, 'y': y, 'score': victories}
 
