@@ -33,7 +33,7 @@ class ApiManager:
     def send(cmd: BrainCommands, message: str):
         """Sends a command to the api"""
         if cmd not in list(BrainCommands):
-            print('DEBUG Invalid brain command: "%s"' % cmd)
+            print('DEBUG Invalid brain command: "%s"' % cmd, flush=True)
             return
         message = "%s %s" % (cmd.name, message)
         print(message, flush=True)
