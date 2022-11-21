@@ -43,8 +43,8 @@ class Core:
                 break
             lines.append(line)
         self.__game__.load_board(lines)
-
-
+        x, y = brain.evaluate(self.__game__)
+        return '%d,%d' % (x, y)
 
     def __handle_begin__(self) -> str:
         """Handles the BEGIN command"""
@@ -63,7 +63,7 @@ class Core:
             return None
         x, y = brain.evaluate(self.__game__)
         self.__game__.new_turn(Players.ME, x, y)
-        self.__manager__.answer('%d,%d' % (x, y))
+        return '%d,%d' % (x, y)
 
     @staticmethod
     def __handle_info__(params: list) -> str:
@@ -107,4 +107,3 @@ class Core:
             res: str = self.__handle__(cmd=ApiCommands[cmd], params=params)
             if res is not None:
                 self.__manager__.answer(res)
-                self.__manager__.send(BrainCommands.DEBUG, res)
