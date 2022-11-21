@@ -13,19 +13,26 @@ class Board:
     def __str__(self) -> str:
         result: str = ''
         for i in range(0, self.height):
+            result += 'MESSAGE '
             for n in range(0, self.length):
                 result += '_' if self.stones[i][n] == 0 else '1' if self.stones[i][n] == 1 else '2'
                 result += ' '
-            result += '\n'
+            result += '\n' if i < self.height - 1 else ''
         return result
+
+    def __getitem__(self, y: int) -> list:
+        """Returns the board.stones[y] row."""
+        return self.stones[y]
+
+    def __setitem__(self, key, value):
+        self.stones[key] = value
 
     def load(self, lines: list):
         """Loads a board from lines of the following format, ended by "DONE":
 
         [X],[Y],[field] where field is 1 (own stone) or 2 (opponent's stone)
         """
-        self.length = len(lines[0])
-        self.height = len(lines)
+        print("MESSAGE Loading board from %s", lines)
         for line in lines:
             [x, y, value] = list(map(int, line.split(',')))
             self.stones[y][x] = value

@@ -152,8 +152,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Piskvork test folder
+# Piskvork test folder and temporary files
 piskvork/
+*.psq
 
 # Fleet config folder
 .fleet/

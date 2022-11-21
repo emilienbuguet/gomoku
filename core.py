@@ -44,7 +44,7 @@ class Core:
             lines.append(line)
         self.__game__.load_board(lines)
         x, y = brain.evaluate(self.__game__)
-        self.__game__.new_turn(x, y, Players['ME'])
+        self.__game__.new_turn(Players['ME'], x, y)
         return '%d,%d' % (x, y)
 
     def __handle_begin__(self) -> str:
