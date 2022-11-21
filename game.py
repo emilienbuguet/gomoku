@@ -28,7 +28,7 @@ class Board:
         self.height = len(lines)
         for line in lines:
             [x, y, value] = list(map(int, line.split(',')))
-            self.stones[x][y] = value
+            self.stones[y][x] = value
 
     def add_stone(self, value: int, x: int, y: int):
         """Adds a stone to the board"""

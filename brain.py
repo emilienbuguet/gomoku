@@ -9,6 +9,6 @@ def generate_random_coordinates(length: int, height: int) -> (int, int):
 def evaluate(game: Game) -> (int, int):
     x: int = -1
     y: int = -1
-    while x < 0 and y < 0 or game.board.stones[x][y] != 0:
+    while x < 0 and y < 0 or game.board.stones[y][x] != 0:
         x, y = generate_random_coordinates(game.board.length, game.board.height)
     return x, y
