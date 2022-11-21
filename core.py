@@ -44,12 +44,13 @@ class Core:
             lines.append(line)
         self.__game__.load_board(lines)
         x, y = brain.evaluate(self.__game__)
+        self.__game__.new_turn(x, y, Players['ME'])
         return '%d,%d' % (x, y)
 
     def __handle_begin__(self) -> str:
         """Handles the BEGIN command"""
         x, y = brain.evaluate(self.__game__)
-        self.__game__.new_turn(Players.ME, x, y)
+        self.__game__.new_turn(Players['ME'], x, y)
         return "%d,%d" % (x, y)
 
     def __handle_turn__(self, params: list) -> str:
@@ -57,7 +58,7 @@ class Core:
         try:
             x = int(params[0])
             y = int(params[1])
-            self.__game__.new_turn(Players.ENNEMY, x, y)
+            self.__game__.new_turn(Players['ENNEMY'], x, y)
         except (ValueError, IndexError):
             self.__manager__.send(BrainCommands.ERROR, 'invalid parameters for TURN')
             return None
