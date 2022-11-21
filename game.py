@@ -51,4 +51,4 @@ class Game:
         self.board.load(lines)
 
     def new_turn(self, player: Players, x, y):
-        self.board.add_stone(player.value(), x, y)
+        self.board.add_stone(player.value, x, y)
