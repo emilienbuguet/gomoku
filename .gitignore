@@ -161,6 +161,7 @@ piskvork/
 
 # Windows executable
 pbrain-gomoku-ai.exe
+pbrain-gomoku-ai
 
 # Jetbrains config folder
 .idea/
