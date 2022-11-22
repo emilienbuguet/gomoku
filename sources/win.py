@@ -1,8 +1,7 @@
-from game import Game, Players, Board
+from game import Players, Board
 
 
 def check_line(line: list, player: Players) -> int:
-    """Checks if a row or col has a winning play"""
     for i in range(len(line) - 4):
         own_stones: int = line[i:i + 5].count(player.value)
         free_stones: int = line[i:i + 5].count(0)
@@ -12,7 +11,6 @@ def check_line(line: list, player: Players) -> int:
 
 
 def check_diag(board: Board, x: int, y: int, direction: str, player) -> (int, int):
-    """Checks if a node is the beginning of a winning diagonal"""
     begin_offset = min(x, y, 4) if direction == 'right' else min(board.length - x - 1, y, 4)
     end_offset = min(board.length - x - 1, board.height - y - 1, 4) if direction == 'right' \
         else min(x, board.height - y - 1, 4)
@@ -27,9 +25,6 @@ def check_diag(board: Board, x: int, y: int, direction: str, player) -> (int, in
 
 
 def win_coordinates(board: Board, player: Players) -> (int, int):
-    """Returns coordinates of the winning move for the given player.
-    :returns: (x, y) or (-1, -1) if there is no winning move.
-    """
     for y in range(board.height):
         x = check_line(board[y], player)
         if x != -1:
@@ -54,7 +49,6 @@ def win_coordinates(board: Board, player: Players) -> (int, int):
 
 
 def has_won(board: Board, player: Players) -> bool:
-    """Checks if player has won the game"""
     def need_to_check_diag(x: int, y: int) -> bool:
         if x > 0 and y > 0 and board[y - 1][x - 1] == player.value:
             if x < board.length - 1 and board[y - 1][x + 1] == 0:
@@ -75,16 +69,13 @@ def has_won(board: Board, player: Players) -> bool:
             left = [board[y + i][x - i] for i in range(5)]
         return right, left
 
-    # Row check
     for row in board.stones:
         if str(player.value) * 5 in ''.join(list(map(str, row))):
             return True
-    # Col check
     cols = [[row[x] for row in board.stones] for x in range(board.length)]
     for col in cols:
         if str(player.value) * 5 in ''.join(list(map(str, col))):
             return True
-    # Diag check
     for y in range(board.height):
         for x in range(board.length):
             if board[y][x] == player.value and need_to_check_diag(x, y):
