@@ -10,9 +10,16 @@ endif
 
 all: $(NAME)
 
+ifeq ($(OS), Windows_NT)
 $(NAME):
 	@pyinstaller $(MAIN) --onefile --name $(NAME)
 	@cp ./dist/$(NAME) .
+else
+$(NAME):
+	@cp ./sources/unix_main.py ./$(NAME)
+	@chmod +x ./$(NAME)
+endif
+
 
 clean:
 	@rm -rf dist/
