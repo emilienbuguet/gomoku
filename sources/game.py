@@ -1,6 +1,7 @@
 from enum import Enum
 
-Players = Enum('Players', ['ME', 'ENNEMY'])
+ME = 1
+ENEMY = 2
 
 
 class Board:
@@ -47,5 +48,5 @@ class Game:
     def load_board(self, lines: list):
         self.board.load(lines)
 
-    def new_turn(self, player: Players, x, y):
-        self.board.add_stone(player.value, x, y)
+    def new_turn(self, player: int, x, y):
+        self.board.add_stone(player, x, y)

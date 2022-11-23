@@ -1,16 +1,16 @@
-from game import Players, Board
+from game import ME, ENEMY, Board
 
 
-def check_line(line: list, player: Players) -> int:
+def check_line(line: list, player: int) -> int:
     for i in range(len(line) - 4):
-        own_stones: int = line[i:i + 5].count(player.value)
+        own_stones: int = line[i:i + 5].count(player)
         free_stones: int = line[i:i + 5].count(0)
         if own_stones == 4 and free_stones == 1:
             return i + line[i:i + 5].index(0)
     return -1
 
 
-def check_diag(board: Board, x: int, y: int, direction: str, player) -> (int, int):
+def check_diag(board: Board, x: int, y: int, direction: str, player: int) -> (int, int):
     begin_offset = min(x, y, 4) if direction == 'right' else min(board.length - x - 1, y, 4)
     end_offset = min(board.length - x - 1, board.height - y - 1, 4) if direction == 'right' \
         else min(x, board.height - y - 1, 4)
@@ -24,7 +24,7 @@ def check_diag(board: Board, x: int, y: int, direction: str, player) -> (int, in
     return -1, -1
 
 
-def win_coordinates(board: Board, player: Players) -> (int, int):
+def win_coordinates(board: Board, player: int) -> (int, int):
     for y in range(board.height):
         x = check_line(board[y], player)
         if x != -1:
@@ -38,7 +38,7 @@ def win_coordinates(board: Board, player: Players) -> (int, int):
 
     for row in range(board.height):
         for col in range(board.length):
-            if board[row][col] == player.value:
+            if board[row][col] == player:
                 x, y = check_diag(board=board, x=col, y=row, direction='right', player=player)
                 if x != -1 and y != -1:
                     return x, y
@@ -48,13 +48,13 @@ def win_coordinates(board: Board, player: Players) -> (int, int):
     return -1, -1
 
 
-def has_won(board: Board, player: Players) -> bool:
+def has_won(board: Board, player: int) -> bool:
     def need_to_check_diag(x: int, y: int) -> bool:
-        if x > 0 and y > 0 and board[y - 1][x - 1] == player.value:
+        if x > 0 and y > 0 and board[y - 1][x - 1] == player:
             if x < board.length - 1 and board[y - 1][x + 1] == 0:
                 return True
             return False
-        if x < board.length - 1 and y > 0 and board[y - 1][x + 1] == player.value:
+        if x < board.length - 1 and y > 0 and board[y - 1][x + 1] == player:
             if x > 0 and board[y - 1][x - 1] == 0:
                 return True
             return False
@@ -70,17 +70,17 @@ def has_won(board: Board, player: Players) -> bool:
         return right, left
 
     for row in board.stones:
-        if str(player.value) * 5 in ''.join(list(map(str, row))):
+        if str(player) * 5 in ''.join(list(map(str, row))):
             return True
     cols = [[row[x] for row in board.stones] for x in range(board.length)]
     for col in cols:
-        if str(player.value) * 5 in ''.join(list(map(str, col))):
+        if str(player) * 5 in ''.join(list(map(str, col))):
             return True
     for y in range(board.height):
         for x in range(board.length):
-            if board[y][x] == player.value and need_to_check_diag(x, y):
+            if board[y][x] == player and need_to_check_diag(x, y):
                 (right, left) = generate_diags(x, y)
-                if [player.value] * 5 == right or [player.value] * 5 == left:
+                if [player] * 5 == right or [player] * 5 == left:
                     return True
 
     return False

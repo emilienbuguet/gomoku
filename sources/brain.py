@@ -1,4 +1,4 @@
-from game import Game, Players, Board
+from game import Game, ME, ENEMY, Board
 from win import has_won
 from random import randint
 from copy import deepcopy
@@ -16,8 +16,8 @@ def has_stone_nearby(board: Board, x: int, y: int) -> bool:
     bottom_right_y = y + 1 if y < board.height - 1 else y
 
     for row in board[top_left_y:bottom_right_y + 1]:
-        if Players['ME'].value in row[top_left_x:bottom_right_x + 1] \
-                or Players['ENNEMY'].value in row[top_left_x:bottom_right_x + 1]:
+        if ME in row[top_left_x:bottom_right_x + 1] \
+                or ENEMY in row[top_left_x:bottom_right_x + 1]:
             return True
     return False
 
@@ -32,11 +32,11 @@ def pruned_legal_moves(board: Board) -> list:
         if has_stone_nearby(board, x, y):
             legal_moves.append((x, y))
             new_board: Board = deepcopy(board)
-            new_board[y][x] = Players['ME'].value
-            if has_won(new_board, Players['ME']):
+            new_board[y][x] = ME
+            if has_won(new_board, ME):
                 win_moves.append((x, y))
-            new_board[y][x] = Players['ENNEMY'].value
-            if has_won(new_board, Players['ENNEMY']):
+            new_board[y][x] = ENEMY
+            if has_won(new_board, ENEMY):
                 win_moves.append((x, y))
 
     return win_moves if win_moves else legal_moves
@@ -47,8 +47,6 @@ def evaluate(game: Game) -> (int, int):
     # if x == -1:
     #     x, y = win_coordinates(game.board, Players['ENNEMY'])
     legal_moves = pruned_legal_moves(game.board)
-    print(legal_moves)
     if not legal_moves:
         return generate_random_coordinates(game.board.length, game.board.height)
-    # winner = [-1, -1, ]
-    return minimax(game, legal_moves)
+    return minimax(game.board, legal_moves)

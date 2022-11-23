@@ -1,7 +1,9 @@
 from random import choice
-from game import Game
+from game import Board, ME, ENEMY
+from math import inf
 
 
-def minimax(game: Game, legal_moves: list()) -> (int, int):
-    # Génération d'un game tree sur une depth donnée
+def minimax(board: Board, legal_moves: list, player: int) -> (int, int):
+    winner: dict = {'x': -1, 'y': -1, 'score': -inf if player == ENEMY else inf}
+
     return choice(legal_moves)
