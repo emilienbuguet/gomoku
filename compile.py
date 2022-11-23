@@ -2,7 +2,8 @@
 from os import system
 
 name = "pbrain-gomoku-ai"
+main = "./sources/main.py"
 
 system("pip install pyinstaller")
-system("pyinstaller %s --onefile --name %s.exe" % (name, name))
+system("pyinstaller %s --onefile --name %s.exe" % (main, name))
 system("cp ./dist/%s.exe ." % name)
