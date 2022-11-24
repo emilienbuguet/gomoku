@@ -4,7 +4,6 @@ import brain
 
 
 class Core:
-
     def __init__(self):
         self.__game__: Game = Game()
         self.__manager__: ApiManager = ApiManager()
@@ -16,7 +15,11 @@ class Core:
 
     def __handle_about__(self) -> str:
         return 'name="%s", version="%s", author="%s", country="%s"' % (
-            self.__name__, self.__version__, self.__author__, self.__country__)
+            self.__name__,
+            self.__version__,
+            self.__author__,
+            self.__country__,
+        )
 
     def __handle_start__(self, params: list) -> str:
         try:
@@ -26,7 +29,7 @@ class Core:
                 self.__game__.new_board(params[0], params[0])
             if params[0] == "0":
                 return "ERROR"
-            return 'OK'
+            return "OK"
         except ValueError:
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for START")
             return None
@@ -35,13 +38,13 @@ class Core:
         lines: list = list()
         while 1:
             line = self.__manager__.receive()
-            if line == 'DONE':
+            if line == "DONE":
                 break
             lines.append(line)
         self.__game__.load_board(lines)
         x, y = brain.evaluate(self.__game__)
         self.__game__.new_turn(ME, x, y)
-        return '%d,%d' % (x, y)
+        return "%d,%d" % (x, y)
 
     def __handle_begin__(self) -> str:
         x, y = brain.evaluate(self.__game__)
@@ -54,11 +57,11 @@ class Core:
             y = int(params[1])
             self.__game__.new_turn(ME, x, y)
         except (ValueError, IndexError):
-            self.__manager__.send(BrainCommands.ERROR, 'invalid parameters for TURN')
+            self.__manager__.send(BrainCommands.ERROR, "invalid parameters for TURN")
             return None
         x, y = brain.evaluate(self.__game__)
         self.__game__.new_turn(ME, x, y)
-        return '%d,%d' % (x, y)
+        return "%d,%d" % (x, y)
 
     @staticmethod
     def __handle_info__(params: list) -> str:
@@ -88,11 +91,14 @@ class Core:
     def start(self):
         while not self.__shutdown__:
             line: str = self.__manager__.receive()
-            cmd: str = line.split(' ')[0]
-            params: list = ''.join(line.split(' ')[1:]).split(',')
+            cmd: str = line.split(" ")[0]
+            params: list = "".join(line.split(" ")[1:]).split(",")
 
             if cmd not in [c.name for c in list(ApiCommands)]:
-                self.__manager__.send(BrainCommands.UNKNOWN, message='api command "%s" is not supported.' % cmd)
+                self.__manager__.send(
+                    BrainCommands.UNKNOWN,
+                    message='api command "%s" is not supported.' % cmd,
+                )
                 continue
 
             res: str = self.__handle__(cmd=ApiCommands[cmd], params=params)

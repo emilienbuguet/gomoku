@@ -30,6 +30,9 @@ clean:
 fclean:	clean
 	@rm -f $(NAME)
 
+format:
+	@black sources/
+
 re:	fclean all
 
 .PHONY:	all \

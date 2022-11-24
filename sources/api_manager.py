@@ -1,12 +1,15 @@
 from sys import stdin
 from enum import Enum
 
-ApiCommands = Enum('ApiCommands', ['START', 'TURN', 'BEGIN', 'BOARD', 'INFO', 'END', 'ABOUT'])
-BrainCommands = Enum('BrainCommands', ['UNKNOWN', 'ERROR', 'MESSAGE', 'DEBUG', 'SUGGEST'])
+ApiCommands = Enum(
+    "ApiCommands", ["START", "TURN", "BEGIN", "BOARD", "INFO", "END", "ABOUT"]
+)
+BrainCommands = Enum(
+    "BrainCommands", ["UNKNOWN", "ERROR", "MESSAGE", "DEBUG", "SUGGEST"]
+)
 
 
 class ApiManager:
-
     def __init__(self):
         self.__shutdown = False
 
@@ -18,7 +21,7 @@ class ApiManager:
         line = stdin.readline()
         if not line:
             return "END"
-        if line.endswith('\n'):
+        if line.endswith("\n"):
             line = line[:-1]
         return line
 

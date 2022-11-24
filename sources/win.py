@@ -3,24 +3,32 @@ from game import ME, ENEMY, Board
 
 def check_line(line: list, player: int) -> int:
     for i in range(len(line) - 4):
-        own_stones: int = line[i:i + 5].count(player)
-        free_stones: int = line[i:i + 5].count(0)
+        own_stones: int = line[i : i + 5].count(player)
+        free_stones: int = line[i : i + 5].count(0)
         if own_stones == 4 and free_stones == 1:
-            return i + line[i:i + 5].index(0)
+            return i + line[i : i + 5].index(0)
     return -1
 
 
 def check_diag(board: Board, x: int, y: int, direction: str, player: int) -> (int, int):
-    begin_offset = min(x, y, 4) if direction == 'right' else min(board.length - x - 1, y, 4)
-    end_offset = min(board.length - x - 1, board.height - y - 1, 4) if direction == 'right' \
+    begin_offset = (
+        min(x, y, 4) if direction == "right" else min(board.length - x - 1, y, 4)
+    )
+    end_offset = (
+        min(board.length - x - 1, board.height - y - 1, 4)
+        if direction == "right"
         else min(x, board.height - y - 1, 4)
-    if direction == 'right':
+    )
+    if direction == "right":
         diag = [board[y + i][x + i] for i in range(-begin_offset, end_offset + 1)]
     else:
         diag = [board[y + i][x - i] for i in range(-begin_offset, end_offset + 1)]
     idx = check_line(diag, player)
     if idx != -1:
-        return x - begin_offset + idx if direction == 'right' else x + begin_offset - idx, y - begin_offset + idx
+        return (
+            x - begin_offset + idx if direction == "right" else x + begin_offset - idx,
+            y - begin_offset + idx,
+        )
     return -1, -1
 
 
@@ -39,10 +47,14 @@ def win_coordinates(board: Board, player: int) -> (int, int):
     for row in range(board.height):
         for col in range(board.length):
             if board[row][col] == player:
-                x, y = check_diag(board=board, x=col, y=row, direction='right', player=player)
+                x, y = check_diag(
+                    board=board, x=col, y=row, direction="right", player=player
+                )
                 if x != -1 and y != -1:
                     return x, y
-                x, y = check_diag(board=board, x=col, y=row, direction='left', player=player)
+                x, y = check_diag(
+                    board=board, x=col, y=row, direction="left", player=player
+                )
                 if x != -1 and y != -1:
                     return x, y
     return -1, -1
@@ -70,11 +82,11 @@ def has_won(board: Board, player: int) -> bool:
         return right, left
 
     for row in board.stones:
-        if str(player) * 5 in ''.join(list(map(str, row))):
+        if str(player) * 5 in "".join(list(map(str, row))):
             return True
     cols = [[row[x] for row in board.stones] for x in range(board.length)]
     for col in cols:
-        if str(player) * 5 in ''.join(list(map(str, col))):
+        if str(player) * 5 in "".join(list(map(str, col))):
             return True
     for y in range(board.height):
         for x in range(board.length):

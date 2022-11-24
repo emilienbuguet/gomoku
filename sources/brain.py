@@ -15,17 +15,26 @@ def has_stone_nearby(board: Board, x: int, y: int) -> bool:
     bottom_right_x = x + 1 if x < board.length - 1 else x
     bottom_right_y = y + 1 if y < board.height - 1 else y
 
-    for row in board[top_left_y:bottom_right_y + 1]:
-        if ME in row[top_left_x:bottom_right_x + 1] \
-                or ENEMY in row[top_left_x:bottom_right_x + 1]:
+    for row in board[top_left_y : bottom_right_y + 1]:
+        if (
+            ME in row[top_left_x : bottom_right_x + 1]
+            or ENEMY in row[top_left_x : bottom_right_x + 1]
+        ):
             return True
     return False
 
 
 def pruned_legal_moves(board: Board) -> list:
-    free_slots: iter = filter(lambda c: c is not None, list([
-        (x, y) if board[y][x] == 0 else None for x in range(board.length) for y in range(board.height)
-    ]))
+    free_slots: iter = filter(
+        lambda c: c is not None,
+        list(
+            [
+                (x, y) if board[y][x] == 0 else None
+                for x in range(board.length)
+                for y in range(board.height)
+            ]
+        ),
+    )
     legal_moves = list()
     win_moves = list()
     for (x, y) in free_slots:

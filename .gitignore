@@ -165,3 +165,6 @@ pbrain-gomoku-ai
 
 # Jetbrains config folder
 .idea/
+
+# Vscode config folder
+.vscode/

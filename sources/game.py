@@ -8,16 +8,24 @@ class Board:
     def __init__(self, length: int, height: int):
         self.length = int(length)
         self.height = int(height)
-        self.stones = [[0 for _ in range(0, self.length)] for _ in range(0, self.height)]
+        self.stones = [
+            [0 for _ in range(0, self.length)] for _ in range(0, self.height)
+        ]
 
     def __str__(self) -> str:
-        result: str = ''
+        result: str = ""
         for i in range(0, self.height):
-            result += 'MESSAGE '
+            result += "MESSAGE "
             for n in range(0, self.length):
-                result += '_' if self.stones[i][n] == 0 else '1' if self.stones[i][n] == 1 else '2'
-                result += ' '
-            result += '\n' if i < self.height - 1 else ''
+                result += (
+                    "_"
+                    if self.stones[i][n] == 0
+                    else "1"
+                    if self.stones[i][n] == 1
+                    else "2"
+                )
+                result += " "
+            result += "\n" if i < self.height - 1 else ""
         return result
 
     def __getitem__(self, y: int) -> list:
@@ -28,7 +36,7 @@ class Board:
 
     def load(self, lines: list):
         for line in lines:
-            [x, y, value] = list(map(int, line.split(',')))
+            [x, y, value] = list(map(int, line.split(",")))
             self.stones[y][x] = value
 
     def add_stone(self, value: int, x: int, y: int):
