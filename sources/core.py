@@ -1,11 +1,15 @@
-from api_manager import ApiManager, ApiCommands, BrainCommands
-from game import Game, ME, ENEMY
-import brain
+"""Here is where the commands of the protocol are implemented"""
+
+from .api_manager import ApiManager, ApiCommands, BrainCommands
+from .game import Game, ME, ENEMY
+from .brain import evaluate
 
 
 class Core:
+    """The command handler, which creates a relation between the game and the API"""
+
     def __init__(self):
-        self.__game__: Game = Game()
+        self._game: Game = Game()
         self.__manager__: ApiManager = ApiManager()
         self.__shutdown__: bool = False
         self.__name__: str = "Gomorvin"
@@ -14,62 +18,58 @@ class Core:
         self.__country__: str = "France"
 
     def __handle_about__(self) -> str:
-        return 'name="%s", version="%s", author="%s", country="%s"' % (
-            self.__name__,
-            self.__version__,
-            self.__author__,
-            self.__country__,
-        )
+        return f'name="{self.__name__}", version="{self.__version__}", author="{self.__author__}", \
+            country="{self.__country__}"'
 
     def __handle_start__(self, params: list) -> str:
         try:
             if len(params) == 2:
-                self.__game__.new_board(params[0], params[1])
+                self._game.new_board(params[0], params[1])
             else:
-                self.__game__.new_board(params[0], params[0])
+                self._game.new_board(params[0], params[0])
             if params[0] == "0":
                 return "ERROR"
             return "OK"
         except ValueError:
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for START")
-            return None
+            return ""
 
     def __handle_board__(self) -> str:
-        lines: list = list()
+        lines: list = []
         while 1:
             line = self.__manager__.receive()
             if line == "DONE":
                 break
             lines.append(line)
-        self.__game__.load_board(lines)
-        x, y = brain.evaluate(self.__game__)
-        self.__game__.new_turn(ME, x, y)
-        return "%d,%d" % (x, y)
+        self._game.load_board(lines)
+        turn_x, turn_y = evaluate(self._game)
+        self._game.new_turn(ME, turn_x, turn_y)
+        return f"{turn_x},{turn_y}"
 
     def __handle_begin__(self) -> str:
-        x, y = brain.evaluate(self.__game__)
-        self.__game__.new_turn(ME, x, y)
-        return "%d,%d" % (x, y)
+        turn_x, turn_y = evaluate(self._game)
+        self._game.new_turn(ME, turn_x, turn_y)
+        return f"{turn_x},{turn_y}"
 
     def __handle_turn__(self, params: list) -> str:
         try:
-            x = int(params[0])
-            y = int(params[1])
-            self.__game__.new_turn(ME, x, y)
+            turn_x = int(params[0])
+            turn_y = int(params[1])
+            self._game.new_turn(ENEMY, turn_x, turn_y)
         except (ValueError, IndexError):
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for TURN")
-            return None
-        x, y = brain.evaluate(self.__game__)
-        self.__game__.new_turn(ME, x, y)
-        return "%d,%d" % (x, y)
+            return ""
+        turn_x, turn_y = evaluate(self._game)
+        self._game.new_turn(ME, turn_x, turn_y)
+        return f"{turn_x},{turn_y}"
 
     @staticmethod
-    def __handle_info__(params: list) -> str:
-        return None
+    def __handle_info__() -> str:
+        return ""
 
     def __handle_end__(self) -> str:
         self.__shutdown__ = True
-        return None
+        return ""
 
     def __handle__(self, cmd: ApiCommands, params: list) -> str:
         if cmd == ApiCommands.ABOUT:
@@ -83,12 +83,13 @@ class Core:
         if cmd == ApiCommands.TURN:
             return self.__handle_turn__(params)
         if cmd == ApiCommands.INFO:
-            return self.__handle_info__(params)
+            return self.__handle_info__()
         if cmd == ApiCommands.END:
             return self.__handle_end__()
-        return None
+        return ""
 
     def start(self):
+        """Starts the Core of the program."""
         while not self.__shutdown__:
             line: str = self.__manager__.receive()
             cmd: str = line.split(" ")[0]
@@ -97,10 +98,10 @@ class Core:
             if cmd not in [c.name for c in list(ApiCommands)]:
                 self.__manager__.send(
                     BrainCommands.UNKNOWN,
-                    message='api command "%s" is not supported.' % cmd,
+                    message=f'api command "{cmd}" is not supported.',
                 )
                 continue
 
             res: str = self.__handle__(cmd=ApiCommands[cmd], params=params)
-            if res is not None:
+            if res:
                 self.__manager__.answer(res)

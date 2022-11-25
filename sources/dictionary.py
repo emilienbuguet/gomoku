@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+"""Here are all the gomoku moves and their values"""
 
 patterns_list = [
     {"pattern": "ooooo", "value": 1000, "symm": True},
@@ -9,7 +9,7 @@ patterns_list = [
     {"pattern": "_ooo_", "value": 35, "symm": True},
     {"pattern": "ooo__", "value": 30, "symm": False},
     {"pattern": "oo_o_", "value": 30, "symm": False},
-    {"patern": "o_o_o", "value": 30, "symm": True},
+    {"pattern": "o_o_o", "value": 30, "symm": True},
     {"pattern": "_oo__", "value": 15, "symm": False},
     {"pattern": "oo___", "value": 15, "symm": True},
     {"pattern": "_o_o_", "value": 15, "symm": True},
