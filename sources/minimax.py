@@ -1,10 +1,10 @@
 """Here is the minimax algorithm implementation, using alpha-beta pruning"""
 import random
-from .game import Board, ENEMY, ME
 from copy import deepcopy
+from math import inf
+from .game import Board, ENEMY, ME
 from .win import has_won
 from .evaluate import evaluate
-from math import inf
 
 
 def get_score(board: Board) -> int:
@@ -89,7 +89,7 @@ def minimax(board: Board, player: int) -> tuple:
         if depth == 0:
             #todo to the check for pruning also here
             #print ({"x": last_move[0], "y": last_move[1], "score": get_score(board)})
-            return {"x": last_move[0], "y": last_move[1], "score": get_score(board)}
+            return {"x": last_move[0], "y": last_move[1], "score": evaluate(board, player)}
 
         if has_won(board, ME):
             return {"x": last_move[0], "y": last_move[1], "score": 1000}
@@ -121,7 +121,7 @@ def minimax(board: Board, player: int) -> tuple:
                     return {"x": last_move[0], "y": last_move[1], "score": -inf}
             return min_res
 
-    alphabeta : dict = {"alpha": [], "beta": []}
+    alphabeta: dict = {"alpha": [], "beta": []}
     best_move = minimax_recur(board, (0, 0), 3, ME, alphabeta)
-    print("best move:", best_move)
+    print("MESSAGE best move:", best_move, flush=True)
     return best_move['x'], best_move['y']
