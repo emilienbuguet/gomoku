@@ -4,6 +4,7 @@ from .game import Board, ENEMY, ME
 from copy import deepcopy
 from .win import has_won
 from .evaluate import evaluate
+from math import inf
 
 
 def get_score(board: Board) -> int:
@@ -84,7 +85,7 @@ def minimax(board: Board, player: int) -> tuple:
         #print("----------------depth %d, player %d----------------" % (depth, player))
         if depth == 0:
             #todo to the check for pruning also here
-            print ({"x": last_move[0], "y": last_move[1], "score": get_score(board)})
+            #print ({"x": last_move[0], "y": last_move[1], "score": get_score(board)})
             return {"x": last_move[0], "y": last_move[1], "score": get_score(board)}
 
         if has_won(board, ME):
