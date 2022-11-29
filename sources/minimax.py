@@ -80,9 +80,13 @@ def pruned_legal_moves(board: Board) -> list:
 def minimax(board: Board, player: int) -> tuple:
     """Minimax algorithm main loop, returns the best move's coordinates"""
 
-    def minimax_recur(board: Board, last_move: tuple,  depth: int, player: int) -> dict:
+    def minimax_recur(board: Board, last_move: tuple,  depth : int, player : int, alphabeta : dict) -> dict:
+        #print("----------------depth %d, player %d----------------" % (depth, player))
         if depth == 0:
-            return {"x": last_move[0], "y": last_move[1], "score": evaluate(board, player)}
+            #todo to the check for pruning also here
+            print ({"x": last_move[0], "y": last_move[1], "score": get_score(board)})
+            return {"x": last_move[0], "y": last_move[1], "score": get_score(board)}
+
         if has_won(board, ME):
             return {"x": last_move[0], "y": last_move[1], "score": 1000}
         if has_won(board, ENEMY):
@@ -94,11 +98,26 @@ def minimax(board: Board, player: int) -> tuple:
         moves = []
         next_turn = ME if player == ENEMY else ENEMY
         for move in legal_moves:
-            moves.append(minimax_recur(deepcopy(board), move, depth - 1, next_turn))
+            res = minimax_recur(deepcopy(board), move, depth - 1, next_turn, alphabeta)
+            moves.append(res)
+            if res["score"] == -inf or res["score"] == inf:
+                break
         if player == ME:
-            return max(moves, key=lambda i: i['score'])
+            max_res = max(moves, key=lambda i: i["score"])
+            alphabeta["alpha"].append(max_res["score"])
+            if alphabeta["alpha"] and alphabeta["beta"]:
+                if alphabeta["alpha"][-1] > alphabeta["beta"][-1]:
+                    return {"x": last_move[0], "y": last_move[1], "score": inf}
+            return max_res
         else:
-            return min(moves, key=lambda i: i['score'])
+            min_res = min(moves, key=lambda i: i["score"])
+            alphabeta["beta"].append(min_res["score"])
+            if alphabeta["alpha"] and alphabeta["beta"]:
+                if alphabeta["beta"][-1] > alphabeta["alpha"][-1]:
+                    return {"x": last_move[0], "y": last_move[1], "score": -inf}
+            return min_res
 
-    best_move = minimax_recur(board, (0, 0), 3, ME)
+    alphabeta : dict = {"alpha": [], "beta": []}
+    best_move = minimax_recur(board, (0, 0), 3, ME, alphabeta)
+    print("best move:", best_move)
     return best_move['x'], best_move['y']
