@@ -37,15 +37,12 @@ def win_coordinates(game: Game, player: Players) -> (int, int):
         begin_offset = min(x, y, 4) if direction == 'right' else min(board.length - x - 1, y, 4)
         end_offset = min(board.length - x - 1, board.height - y - 1, 4) if direction == 'right'\
             else min(x, board.height - y - 1, 4)
-        print("MESSAGE Diag with begin offset at %d and end offset at %d" % (begin_offset, end_offset))
         if direction == 'right':
             diag = [board[y + i][x + i] for i in range(-begin_offset, end_offset + 1)]
         else:
             diag = [board[y + i][x - i] for i in range(-begin_offset, end_offset + 1)]
-        print("MESSAGE Diag with direction %s: %s" % (direction, str(diag)))
         idx = check_line(diag)
         if idx != -1:
-            print("MESSAGE Found winning stone at %d" % idx)
             return x - begin_offset + idx if direction == 'right' else x + begin_offset - idx, y - begin_offset + idx
         # # Left Diagonal
         # offset = find_left_offset(board, x, y)
@@ -57,20 +54,17 @@ def win_coordinates(game: Game, player: Players) -> (int, int):
         #     return x - idx, y + idx
         return -1, -1
 
-    print("MESSAGE Check row")
     for y in range(game.board.height):
         x = check_line(game.board[y])
         if x != -1:
             return x, y
 
-    print("MESSAGE Check col")
     for x in range(game.board.length):
         col = [row[x] for row in game.board.stones]
         y = check_line(col)
         if y != -1:
             return x, y
 
-    print(game.board)
 
     for row in range(game.board.height):
         for col in range(game.board.length):

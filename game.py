@@ -32,7 +32,6 @@ class Board:
 
         [X],[Y],[field] where field is 1 (own stone) or 2 (opponent's stone)
         """
-        print("MESSAGE Loading board from %s", lines)
         for line in lines:
             [x, y, value] = list(map(int, line.split(',')))
             self.stones[y][x] = value
