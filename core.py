@@ -29,6 +29,8 @@ class Core:
                 self.__game__.new_board(params[0], params[1])
             else:
                 self.__game__.new_board(params[0], params[0])
+            if params[0] == "0":
+                return "ERROR"
             return 'OK'
         except ValueError:
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for START")
