@@ -36,13 +36,13 @@ def has_stone_nearby(board: Board, node_x: int, node_y: int) -> bool:
     bottom_right_x = node_x + 1 if node_x < board.length - 1 else node_x
     bottom_right_y = node_y + 1 if node_y < board.height - 1 else node_y
 
-    for row in board[top_left_y : bottom_right_y + 1]:
+    for row in board[top_left_y: bottom_right_y + 1]:
         if (
-            ME in row[top_left_x : bottom_right_x + 1]
-            or ENEMY in row[top_left_x : bottom_right_x + 1]
+            ME in row[top_left_x: bottom_right_x + 1]
+            or ENEMY in row[top_left_x: bottom_right_x + 1]
         ):
             return True
-        return False
+    return False
 
 
 def pruned_legal_moves(board: Board) -> list:
@@ -68,10 +68,13 @@ def pruned_legal_moves(board: Board) -> list:
         if has_stone_nearby(board, col, row):
             legal_moves.append((col, row))
             new_board: Board = deepcopy(board)
-            new_board[row] = new_board[row][:col] + ME + new_board[row][col + 1 :]
+            line = list(new_board[row])
+            line[col] = ME
+            new_board[row] = line
             if has_won(new_board, ME):
                 win_moves.append((col, row))
-            new_board[row] = new_board[row][:col] + ENEMY + new_board[row][col + 1 :]
+            line[col] = ENEMY
+            new_board[row] = line
             if has_won(new_board, ENEMY):
                 win_moves.append((col, row))
 
@@ -92,7 +95,7 @@ def minimax(board: Board, player: int) -> tuple:
             return {"x": last_move[0], "y": last_move[1], "score": 1000}
         if has_won(board, ENEMY):
             return {"x": last_move[0], "y": last_move[1], "score": -1000}
-        legal_moves: list = pruned_legal_moves(board)
+        legal_moves = pruned_legal_moves(board)
         if not legal_moves:
             return {"x": last_move[0], "y": last_move[1], "score": evaluate(board, player)}
 

@@ -68,12 +68,15 @@ def has_won(board: Board, player: int) -> bool:
             left = "".join([board[node_y + i][node_x - i] for i in range(5)])
         return right, left
 
+
     for row in board.stones:
-        if str(player) * 5 in row:
+        row_str = "".join(row)
+        if str(player) * 5 in row_str:
             return True
     cols = ["".join([row[x] for row in board.stones]) for x in range(board.length)]
     for col in cols:
-        if str(player) * 5 in col:
+        col_str = "".join(col)
+        if str(player) * 5 in col_str:
             return True
     for row in range(board.height):
         for col in range(board.length):
@@ -83,5 +86,4 @@ def has_won(board: Board, player: int) -> bool:
                 (right, left) = generate_diags(col, row)
                 if player * 5 == right or player * 5 == left:
                     return True
-
     return False

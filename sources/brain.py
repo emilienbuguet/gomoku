@@ -1,6 +1,6 @@
 """Here is the main loop of the brain algorithm"""
 
-from random import randint
+from random import randint, choice
 from .game import Game, ME
 from .minimax import minimax, pruned_legal_moves
 
@@ -28,7 +28,8 @@ def get_best_move(game: Game) -> tuple:
         tuple: Coordinates of the best move to make
     """
     legal_moves = pruned_legal_moves(game.board)
+    # if win_moves:
+    #     return win_moves[0]
     if not legal_moves:
         return generate_random_coordinates(game.board.length, game.board.height)
-    print(game.board)
     return minimax(game.board, player=ME)
