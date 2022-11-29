@@ -48,7 +48,7 @@ class Game:
     """Game class"""
     def __init__(self):
         """Constructor"""
-        self.board = Board(0, 0)
+        self.board = Board(20, 20)
 
     def new_board(self, length: int, height: int):
         """Creates an empty board of length x and height y"""

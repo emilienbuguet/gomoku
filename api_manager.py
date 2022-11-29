@@ -23,6 +23,8 @@ class ApiManager:
         :return: The received command line
         """
         line = stdin.readline()
+        if not line:
+            return "END"
         if line.endswith('\n'):
             line = line[:-1]
         return line
