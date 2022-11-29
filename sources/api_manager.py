@@ -65,7 +65,7 @@ class ApiManager:
         if cmd not in list(BrainCommands):
             print(f'DEBUG Invalid brain command: "{cmd}"', flush=True)
             return
-        message = f"{cmd.name} {message}" % (cmd.name, message)
+        message = f"{cmd.name} {message}"
         print(message, flush=True)
 
     @staticmethod
