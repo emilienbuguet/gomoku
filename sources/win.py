@@ -12,6 +12,33 @@ from .game import Board
 #     return -1
 
 
+def need_to_check_diag(board: Board, node_x: int, node_y: int, player: int) -> bool:
+    """Checks if diagonals have to be checked for the current cell
+
+    Args:
+        board (Board): State of the game
+        node_x (int): x coordinate of the current cell
+        node_y (int): y coordinate of the current cell
+        player (int): Player being checked
+
+    Returns:
+        bool: True if the diagonals have to be checked, False otherwise
+    """
+    if node_x > 0 and node_y > 0 and board[node_y - 1][node_x - 1] == player:
+        if node_x < board.length - 1 and board[node_y - 1][node_x + 1] == 0:
+            return True
+        return False
+    if (
+        node_x < board.length - 1
+        and node_y > 0
+        and board[node_y - 1][node_x + 1] == player
+    ):
+        if node_x > 0 and board[node_y - 1][node_x - 1] == 0:
+            return True
+        return False
+    return True
+
+
 def has_won(board: Board, player: int) -> bool:
     """Checks if the player has won the game
 
@@ -23,56 +50,38 @@ def has_won(board: Board, player: int) -> bool:
         bool: True if the player has won the game, False otherwise
     """
 
-    def need_to_check_diag(node_x: int, node_y: int) -> bool:
-        """Checks if diagonals have to be checked for the current cell
-
-        Args:
-            x (int): x coordinate of the current cell
-            y (int): y coordinate of the current cell
-
-        Returns:
-            bool: True if the diagonals have to be checked, False otherwise
-        """
-        if node_x > 0 and node_y > 0 and board[node_y - 1][node_x - 1] == player:
-            if node_x < board.length - 1 and board[node_y - 1][node_x + 1] == 0:
-                return True
-            return False
-        if node_x < board.length - 1 and node_y > 0 and board[node_y - 1][node_x + 1] == player:
-            if node_x > 0 and board[node_y - 1][node_x - 1] == 0:
-                return True
-            return False
-        return True
-
     def generate_diags(node_x: int, node_y: int) -> tuple:
         """Generates the diagonals for the current cell
 
         Args:
-            x (int): x coordinate of the current cell
-            y (int): y coordinate of the current cell
+            node_x (int): x coordinate of the current cell
+            node_y (int): y coordinate of the current cell
 
         Returns:
             tuple: A tuple containing the diagonals
         """
-        right = []
-        left = []
+        right = ""
+        left = ""
         if node_y < board.height - 5 and node_x < board.length - 5:
-            right = [board[node_y + i][node_x + i] for i in range(5)]
+            right = "".join([board[node_y + i][node_x + i] for i in range(5)])
         if node_y < board.height - 5 and node_x >= 4:
-            left = [board[node_y + i][node_x - i] for i in range(5)]
+            left = "".join([board[node_y + i][node_x - i] for i in range(5)])
         return right, left
 
     for row in board.stones:
-        if str(player) * 5 in "".join(list(map(str, row))):
+        if str(player) * 5 in row:
             return True
-    cols = [[row[x] for row in board.stones] for x in range(board.length)]
+    cols = ["".join([row[x] for row in board.stones]) for x in range(board.length)]
     for col in cols:
-        if str(player) * 5 in "".join(list(map(str, col))):
+        if str(player) * 5 in col:
             return True
     for row in range(board.height):
         for col in range(board.length):
-            if board[row][col] == player and need_to_check_diag(col, row):
+            if board[row][col] == player and need_to_check_diag(
+                board, col, row, player
+            ):
                 (right, left) = generate_diags(col, row)
-                if [player] * 5 == right or [player] * 5 == left:
+                if player * 5 == right or player * 5 == left:
                     return True
 
     return False

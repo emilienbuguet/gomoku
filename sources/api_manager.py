@@ -6,6 +6,7 @@ from enum import Enum, auto
 
 class ApiCommands(Enum):
     """Enum of all the commands that can be sent by the Piskvork API"""
+
     START = auto()
     TURN = auto()
     BEGIN = auto()
@@ -17,6 +18,7 @@ class ApiCommands(Enum):
 
 class BrainCommands(Enum):
     """Enum of all the commands that can be sent by the brain"""
+
     UNKNOWN = auto()
     ERROR = auto()
     MESSAGE = auto()
@@ -26,6 +28,7 @@ class BrainCommands(Enum):
 
 class ApiManager:
     """Utility class for communicating with the API"""
+
     def __init__(self):
         self.__shutdown = False
 

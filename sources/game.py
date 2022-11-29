@@ -1,7 +1,7 @@
 """Here is the gomoku implementation without GUI"""
 
-ME = 1
-ENEMY = 2
+ME = '1'
+ENEMY = '2'
 
 
 class Board:
@@ -11,7 +11,7 @@ class Board:
         self.length = int(length)
         self.height = int(height)
         self.stones = [
-            [0 for _ in range(0, self.length)] for _ in range(0, self.height)
+            '0' * self.length for _ in range(0, self.height)
         ]
 
     def __str__(self) -> str:
@@ -21,16 +21,16 @@ class Board:
             for j in range(0, self.length):
                 result += (
                     "_"
-                    if self.stones[i][j] == 0
+                    if self.stones[i][j] == "0"
                     else "1"
-                    if self.stones[i][j] == 1
+                    if self.stones[i][j] == "1"
                     else "2"
                 )
                 result += " "
             result += "\n" if i < self.height - 1 else ""
         return result
 
-    def __getitem__(self, i: int) -> list:
+    def __getitem__(self, i: int) -> str:
         return self.stones[i]
 
     def __setitem__(self, key, value):
@@ -43,8 +43,12 @@ class Board:
             lines (list): Lines of the given format : x,y,value
         """
         for line in lines:
-            [x_coordinate, y_coordinate, value] = list(map(int, line.split(",")))
-            self.stones[y_coordinate][x_coordinate] = value
+            [x_coordinate, y_coordinate, value] = line.split(",")
+
+            list_line = list(self.stones[int(y_coordinate)])
+            list_line[int(x_coordinate)] = value
+
+            self.stones[int(y_coordinate)] = ''.join(list_line)
 
     def add_stone(self, value: int, stone_x: int, stone_y: int):
         """Adds a new stone to the board.
@@ -61,7 +65,9 @@ class Board:
             or stone_y >= self.height
         ):
             raise ValueError(f"Out of bounds: ({stone_x}, {stone_y})")
-        self.stones[stone_y][stone_x] = value
+        line_list = list(self.stones[stone_y])
+        line_list[stone_x] = value
+        self.stones[stone_y] = ''.join(line_list)
 
 
 class Game:

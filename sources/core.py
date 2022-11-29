@@ -2,7 +2,7 @@
 
 from .api_manager import ApiManager, ApiCommands, BrainCommands
 from .game import Game, ME, ENEMY
-from .brain import evaluate
+from .brain import get_best_move
 
 
 class Core:
@@ -42,12 +42,12 @@ class Core:
                 break
             lines.append(line)
         self._game.load_board(lines)
-        turn_x, turn_y = evaluate(self._game)
+        turn_x, turn_y = get_best_move(self._game)
         self._game.new_turn(ME, turn_x, turn_y)
         return f"{turn_x},{turn_y}"
 
     def __handle_begin__(self) -> str:
-        turn_x, turn_y = evaluate(self._game)
+        turn_x, turn_y = get_best_move(self._game)
         self._game.new_turn(ME, turn_x, turn_y)
         return f"{turn_x},{turn_y}"
 
@@ -59,7 +59,7 @@ class Core:
         except (ValueError, IndexError):
             self.__manager__.send(BrainCommands.ERROR, "invalid parameters for TURN")
             return ""
-        turn_x, turn_y = evaluate(self._game)
+        turn_x, turn_y = get_best_move(self._game)
         self._game.new_turn(ME, turn_x, turn_y)
         return f"{turn_x},{turn_y}"
 
