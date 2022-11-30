@@ -2,7 +2,6 @@
 
 from .game import Board
 from .dictionary import pattern_list
-from .win import need_to_check_diag
 
 
 def check_line(line: str, pattern: str) -> bool:
@@ -57,55 +56,86 @@ def generate_bidirectional_diags(board: Board, node_x: int, node_y: int) -> tupl
     return right, left
 
 
-def is_pattern_in_board(pattern: str, board: Board, player: int) -> bool:
+def static_eval(row: str, col: str, right: str, left: str, x: int, y: int, player: str) -> int:
+    def get_static_index(line: str, default: int) -> int:
+        while default > 0 and line[default - 1] == player:
+            default -= 1
+        return default
+
+    def get_static_value_line(line: str, index: int) -> int:
+        length = 0
+        for i in line[index:]:
+            if i == player:
+                length += 1
+            else:
+                break
+        return length
+
+    def get_static_value_diag(line: str) -> int:
+        length = 0
+        for i in range(5):
+            if player * i in line:
+                length = i
+            else:
+                break
+        return length
+
+    row_index = get_static_index(row, x)
+    col_index = get_static_index(col, y)
+    return (get_static_value_line(row, row_index) + get_static_value_line(col, col_index) +
+            get_static_value_diag(right) + get_static_value_diag(left))
+
+
+def is_cell_in_pattern(pattern: str, board: Board, x: int, y: int, player: str) -> tuple:
     """Checks if the given pattern figures in the board
 
     Args:
         pattern (str): Pattern as string
         board (Board): Current state of the game
-        player (int): Player that is being checked
+        x (int): X coordinate of the cell
+        y (int): Y coordinate of the cell
+        player (str): Player that is being checked
 
     Returns:
         bool: True if pattern is in the board, False otherwise
     """
 
-    for row in board:
-        if check_line(row, pattern):
-            return True
+    if check_line(board[y], pattern):
+        return True, 0
 
-    cols = ["".join([row[i] for row in board.stones]) for i in range(board.length)]
-    for col in cols:
-        if check_line(col, pattern):
-            return True
+    col = "".join([row[x] for row in board.stones])
+    if check_line(col, pattern):
+        return True, 0
 
-    for row in range(board.height):
-        for col in range(board.length):
-            if board[row][col] == player and need_to_check_diag(
-                board, col, row, player
-            ):
-                (right, left) = generate_bidirectional_diags(board, col, row)
-                if pattern in right or pattern in left:
-                    return True
-    return False
+    (right, left) = generate_bidirectional_diags(board, x, y)
+    if check_line(right, pattern) or check_line(left, pattern):
+        return True, 0
+    return False, static_eval(board[y], col, right, left, x, y, player)
 
 
-def evaluate(board: Board, player: int) -> int:
+def evaluate(board: Board, player: str, x: int, y: int) -> int:
     """Returns the value of a board for a player
 
     Args:
         board (Board): The state of the game
         player (int): either ME or ENEMY (1 or 2)
+        x (int): X coordinate of the node
+        y (int) Y coordinate of the node
 
     Returns:
         int: The value of the given board for the given player
     """
     pattern_list.sort(key=lambda p: p["value"], reverse=True)
+    row = board[y]
+    col = "".join([row[x] for row in board.stones])
+    (right, left) = generate_bidirectional_diags(board, x, y)
     for pattern in pattern_list:
         pattern_str = pattern["pattern"].replace("o", str(player)).replace("_", "0")
-        if is_pattern_in_board(pattern_str, board, player):
+        if check_line(row, pattern_str) or check_line(col, pattern_str) or check_line(right, pattern_str) or \
+           check_line(left, pattern_str):
             return pattern["value"]
-        if not pattern["symm"] and is_pattern_in_board(
-            pattern_str[::-1], board, player
-        ):
+        rev_pattern = pattern_str[::-1]
+        if check_line(row, rev_pattern) or check_line(col, rev_pattern) or check_line(right, rev_pattern) or \
+           check_line(left, rev_pattern):
             return pattern["value"]
-    return 0
+    return static_eval(row, col, right, left, x, y, player)

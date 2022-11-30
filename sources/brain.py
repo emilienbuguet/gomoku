@@ -28,8 +28,10 @@ def get_best_move(game: Game) -> tuple:
         tuple: Coordinates of the best move to make
     """
     legal_moves = pruned_legal_moves(game.board)
-    # if win_moves:
-    #     return win_moves[0]
     if not legal_moves:
         return generate_random_coordinates(game.board.length, game.board.height)
-    return minimax(game.board, player=ME)
+    if len(legal_moves) == 1:
+        return legal_moves[0]
+    print(game.board)
+    print(legal_moves)
+    return minimax(game.board, legal_moves)

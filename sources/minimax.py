@@ -6,6 +6,8 @@ from .game import Board, ENEMY, ME
 from .win import has_won
 from .evaluate import evaluate
 
+MAX_DEPTH = 2
+
 
 def get_score(board: Board) -> int:
     """Returns the score of a move
@@ -64,6 +66,8 @@ def pruned_legal_moves(board: Board) -> list:
     )
     legal_moves = []
     win_moves = []
+    if has_won(board, ME) or has_won(board, ENEMY):
+        return []
     for (col, row) in free_slots:
         if has_stone_nearby(board, col, row):
             legal_moves.append((col, row))
@@ -81,47 +85,82 @@ def pruned_legal_moves(board: Board) -> list:
     return win_moves if win_moves else legal_moves
 
 
-def minimax(board: Board, player: int) -> tuple:
+def update_legal_moves(x: int, y: int, legal_moves: list, board: Board) -> list:
+    round_moves = [
+        (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+        (x - 1, y), (x + 1, y),
+        (x - 1, y + 1), (x, y + 1), (x + 1, y + 1),
+    ]
+    new_moves = []
+
+    for move in legal_moves:
+        if move[0] != x and move[1] != y:
+            new_moves.append(move)
+    for move in round_moves:
+        if move in legal_moves:
+            continue
+        if move[0] < 0 or move[1] < 0:
+            continue
+        if move[0] > board.length - 1 or move[1] > board.height - 1:
+            continue
+        if board[move[1]][move[0]] != "0":
+            continue
+        new_moves.append(move)
+    return new_moves
+
+#
+# def downgrade_legal_moves(x: int, y: int, legal_moves: list):
+#     old_moves = [
+#         (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
+#         (x - 1, y), (x + 1, y),
+#         (x - 1, y + 1), (x, y + 1), (x + 1, y + 1),
+#     ]
+#     for move in old_moves:
+#         if move in legal_moves:
+#             del legal_moves[legal_moves.index(move)]
+
+
+def minimax(board: Board, begin_legal_moves: list) -> tuple:
     """Minimax algorithm main loop, returns the best move's coordinates"""
 
-    def minimax_recur(board: Board, last_move: tuple,  depth : int, player : int, alphabeta : dict) -> dict:
-        #print("----------------depth %d, player %d----------------" % (depth, player))
-        if depth == 0:
-            #todo to the check for pruning also here
-            #print ({"x": last_move[0], "y": last_move[1], "score": get_score(board)})
-            return {"x": last_move[0], "y": last_move[1], "score": evaluate(board, player)}
-
-        if has_won(board, ME):
-            return {"x": last_move[0], "y": last_move[1], "score": 1000}
-        if has_won(board, ENEMY):
-            return {"x": last_move[0], "y": last_move[1], "score": -1000}
-        legal_moves = pruned_legal_moves(board)
-        if not legal_moves:
-            return {"x": last_move[0], "y": last_move[1], "score": evaluate(board, player)}
-
-        moves = []
+    def minimax_recur(depth: int, player: str, legal_moves: list, prev_alphabeta: int) -> int:
         next_turn = ME if player == ENEMY else ENEMY
-        for move in legal_moves:
-            res = minimax_recur(deepcopy(board), move, depth - 1, next_turn, alphabeta)
-            moves.append(res)
-            if res["score"] == -inf or res["score"] == inf:
-                break
-        if player == ME:
-            max_res = max(moves, key=lambda i: i["score"])
-            alphabeta["alpha"].append(max_res["score"])
-            if alphabeta["alpha"] and alphabeta["beta"]:
-                if alphabeta["alpha"][-1] > alphabeta["beta"][-1]:
-                    return {"x": last_move[0], "y": last_move[1], "score": inf}
-            return max_res
-        else:
-            min_res = min(moves, key=lambda i: i["score"])
-            alphabeta["beta"].append(min_res["score"])
-            if alphabeta["alpha"] and alphabeta["beta"]:
-                if alphabeta["beta"][-1] > alphabeta["alpha"][-1]:
-                    return {"x": last_move[0], "y": last_move[1], "score": -inf}
-            return min_res
+        alphabeta = inf if player == ENEMY else -inf
 
-    alphabeta: dict = {"alpha": [], "beta": []}
-    best_move = minimax_recur(board, (0, 0), 3, ME, alphabeta)
-    print("MESSAGE best move:", best_move, flush=True)
-    return best_move['x'], best_move['y']
+        for move in legal_moves:
+            line_list: list = list(dup_board[move[1]])
+            line_list[move[0]] = player
+            dup_board[move[1]] = ''.join(line_list)
+
+            next_moves = update_legal_moves(move[0], move[1], legal_moves, dup_board)
+            res = minimax_recur(depth - 1, next_turn, next_moves, alphabeta) if depth != 0\
+                else evaluate(dup_board, player, move[0], move[1]) if player == ME else - evaluate(dup_board, player, move[0], move[1])
+            if (player == ME and res >= alphabeta) \
+                    or (player == ENEMY and res <= alphabeta):
+                alphabeta = res
+            if (player == ME and alphabeta >= prev_alphabeta)\
+                    or (player == ENEMY and alphabeta <= prev_alphabeta):
+                break
+
+            line_list: list = list(dup_board[move[1]])
+            line_list[move[0]] = '0'
+            dup_board[move[1]] = ''.join(line_list)
+        return alphabeta
+
+    best_move: tuple = begin_legal_moves[0]
+    dup_board = deepcopy(board)
+    alpha = -inf
+    for begin in begin_legal_moves:
+        line: list = list(dup_board[begin[1]])
+        line[begin[0]] = ME
+        dup_board[begin[1]] = ''.join(line)
+        dup_moves = update_legal_moves(begin[0], begin[1], begin_legal_moves, board)
+        score = minimax_recur(MAX_DEPTH, ENEMY, dup_moves, alpha)
+        if alpha <= score:
+            alpha = score
+            best_move = begin
+        line: list = list(dup_board[begin[1]])
+        line[begin[0]] = '0'
+        dup_board[begin[1]] = ''.join(line)
+    print("MESSAGE best move: %s with score %.2f" % (best_move, float(alpha)), flush=True)
+    return best_move

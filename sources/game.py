@@ -76,6 +76,18 @@ class Game:
     def __init__(self):
         """Constructor"""
         self.board = Board(20, 20)
+        self.load_board([
+            '5,17,2',
+            '5,16,2',
+            '5,15,2',
+            '5,13,2',
+            '4,17,2',
+            '6,17,1',
+            '3,17,1',
+            '6,15,1',
+            '1,15,1',
+            '0,14,1'
+        ])
 
     def new_board(self, length: int, height: int):
         """Creates a new empty board with the given length and height
