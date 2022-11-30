@@ -6,7 +6,7 @@ from .game import Board, ENEMY, ME
 from .win import has_won
 from .evaluate import evaluate
 
-MAX_DEPTH = 2
+MAX_DEPTH = 3
 
 
 def get_score(board: Board) -> int:
@@ -156,6 +156,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
         dup_board[begin[1]] = ''.join(line)
         dup_moves = update_legal_moves(begin[0], begin[1], begin_legal_moves, board)
         score = minimax_recur(MAX_DEPTH, ENEMY, dup_moves, alpha)
+        print(score)
         if alpha <= score:
             alpha = score
             best_move = begin

@@ -1,6 +1,6 @@
 """This is where the evaluation function of our algorithm is implemented"""
 
-from .game import Board
+from .game import Board, ME, ENEMY
 from .dictionary import pattern_list
 
 
@@ -128,9 +128,10 @@ def evaluate(board: Board, player: str, x: int, y: int) -> int:
     pattern_list.sort(key=lambda p: p["value"], reverse=True)
     row = board[y]
     col = "".join([row[x] for row in board.stones])
+    other_player = ME if player == ENEMY else ENEMY
     (right, left) = generate_bidirectional_diags(board, x, y)
     for pattern in pattern_list:
-        pattern_str = pattern["pattern"].replace("o", str(player)).replace("_", "0")
+        pattern_str = pattern["pattern"].replace("o", str(player)).replace("_", "0").replace("x", str(other_player))
         if check_line(row, pattern_str) or check_line(col, pattern_str) or check_line(right, pattern_str) or \
            check_line(left, pattern_str):
             return pattern["value"]
