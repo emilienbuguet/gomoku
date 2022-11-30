@@ -140,6 +140,9 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
                 alphabeta = res
             if (player == ME and alphabeta >= prev_alphabeta)\
                     or (player == ENEMY and alphabeta <= prev_alphabeta):
+                line_list: list = list(dup_board[move[1]])
+                line_list[move[0]] = '0'
+                dup_board[move[1]] = ''.join(line_list)
                 break
 
             line_list: list = list(dup_board[move[1]])
@@ -156,7 +159,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
         dup_board[begin[1]] = ''.join(line)
         dup_moves = update_legal_moves(begin[0], begin[1], begin_legal_moves, board)
         score = minimax_recur(MAX_DEPTH, ENEMY, dup_moves, alpha)
-        print(score)
+        print(f"MESSAGE Got {str(score)} for move {str(begin)}")
         if alpha <= score:
             alpha = score
             best_move = begin
