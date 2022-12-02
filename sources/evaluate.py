@@ -127,7 +127,9 @@ def evaluate(board: Board, player: str, x: int, y: int) -> int:
     """
     pattern_list.sort(key=lambda p: p["value"], reverse=True)
     row = board[y]
+    row = row[x - 2 if x - 2 >= 0 else 0: x + 4 if x + 4 < len(row) else len(row) - 1]
     col = "".join([row[x] for row in board.stones])
+    col = col[y - 2 if y - 2 >= 0 else 0: y + 4 if y + 4 < len(col) else len(col) - 1]
     other_player = ME if player == ENEMY else ENEMY
     (right, left) = generate_bidirectional_diags(board, x, y)
     for pattern in pattern_list:
@@ -139,4 +141,4 @@ def evaluate(board: Board, player: str, x: int, y: int) -> int:
         if check_line(row, rev_pattern) or check_line(col, rev_pattern) or check_line(right, rev_pattern) or \
            check_line(left, rev_pattern):
             return pattern["value"]
-    return static_eval(row, col, right, left, x, y, player)
+    return static_eval(row, col, right, left, 2, 2, player)

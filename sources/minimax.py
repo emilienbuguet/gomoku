@@ -85,7 +85,7 @@ def pruned_legal_moves(board: Board) -> list:
     return win_moves if win_moves else legal_moves
 
 
-def update_legal_moves(x: int, y: int, legal_moves: list, board: Board) -> list:
+def update_legal_moves(x: int, y: int, board: Board) -> list:
     round_moves = [
         (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
         (x - 1, y), (x + 1, y),
@@ -93,12 +93,7 @@ def update_legal_moves(x: int, y: int, legal_moves: list, board: Board) -> list:
     ]
     new_moves = []
 
-    for move in legal_moves:
-        if move[0] != x and move[1] != y:
-            new_moves.append(move)
     for move in round_moves:
-        if move in legal_moves:
-            continue
         if move[0] < 0 or move[1] < 0:
             continue
         if move[0] > board.length - 1 or move[1] > board.height - 1:
@@ -132,7 +127,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
             line_list[move[0]] = player
             dup_board[move[1]] = ''.join(line_list)
 
-            next_moves = update_legal_moves(move[0], move[1], legal_moves, dup_board)
+            next_moves = update_legal_moves(move[0], move[1], dup_board)
             res = minimax_recur(depth - 1, next_turn, next_moves, alphabeta) if depth != 0\
                 else evaluate(dup_board, player, move[0], move[1]) if player == ME else - evaluate(dup_board, player, move[0], move[1])
             if (player == ME and res >= alphabeta) \
@@ -157,7 +152,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
         line: list = list(dup_board[begin[1]])
         line[begin[0]] = ME
         dup_board[begin[1]] = ''.join(line)
-        dup_moves = update_legal_moves(begin[0], begin[1], begin_legal_moves, board)
+        dup_moves = update_legal_moves(begin[0], begin[1], board)
         score = minimax_recur(MAX_DEPTH, ENEMY, dup_moves, alpha)
         print(f"MESSAGE Got {str(score)} for move {str(begin)}")
         if alpha <= score:
