@@ -14,8 +14,8 @@ def check_line(line: str, pattern: str) -> bool:
     return pattern in line
 
 
-def generate_bidirectional_diags(board: Board, node_x: int, node_y: int) -> tuple:
-    """Generates the bidirectional diagonals for the current cell
+def generate_right_diag(board: Board, node_x: int, node_y: int) -> str:
+    """Generates the right diagonals for the current cell
 
     Args:
         board (Board): State of the game
@@ -24,121 +24,106 @@ def generate_bidirectional_diags(board: Board, node_x: int, node_y: int) -> tupl
 
     Returns:
         tuple: Both bidirectional diagonals
+
     """
-    right_min_offset = min(5 if node_x >= 5 else node_x, 5 if node_y >= 5 else node_y)
-    right_max_offset = min(5 if node_x < board.length - 5 else board.length - node_x - 1,
-                           5 if node_y < board.height - 5 else board.height - node_y - 1)
-    left_min_offset = min(5 if node_x < board.length - 5 else board.length - node_x - 1,
-                          5 if node_y >= 5 else node_y)
-    left_max_offset = min(5 if node_x >= 5 else node_x,
-                          5 if node_y < board.height - 5 else board.height - node_y - 1)
+    right_min_offset = min(10 if node_x >= 10 else node_x, 10 if node_y >= 10 else node_y)
+    right_max_offset = min(10 if node_x < board.length - 10 else board.length - node_x - 1,
+                           10 if node_y < board.height - 10 else board.height - node_y - 1)
 
     right_x = node_x - right_min_offset
-    left_x = node_x + left_min_offset
+
     max_right_x = node_x + right_max_offset
-    min_left_x = node_x - left_max_offset
     right_y = node_y - right_min_offset
     right_max_y = node_y + right_max_offset
-    left_y = node_y - left_min_offset
-    left_max_y = node_y + left_max_offset
 
     right = ""
-    left = ""
 
     for row in range(right_y, right_max_y + 1):
         if right_x <= max_right_x:
             right = right + board[row][right_x]
             right_x += 1
+    return right
+
+
+def generate_left_diag(board: Board, node_x: int, node_y: int) -> str:
+    """Generates the right diagonals for the current cell
+
+    Args:
+        board (Board): State of the game
+        node_x (int): x coordinate of the current cell
+        node_y (int): y coordinate of the current cell
+
+    Returns:
+        tuple: Both bidirectional diagonals
+
+    """
+    left_min_offset = min(10 if node_x < board.length - 10 else board.length - node_x - 1,
+                          10 if node_y >= 10 else node_y)
+    left_max_offset = min(10 if node_x >= 10 else node_x,
+                          10 if node_y < board.height - 10 else board.height - node_y - 1)
+
+    left_x = node_x + left_min_offset
+    min_left_x = node_x - left_max_offset
+    left_y = node_y - left_min_offset
+    left_max_y = node_y + left_max_offset
+
+    left = ""
+
     for row in range(left_y, left_max_y + 1):
         if left_x >= min_left_x:
             left = left + board[row][left_x]
             left_x -= 1
+    return left
+
+
+def generate_bidirectional_diags_coords(board: Board) -> tuple:
+    """Generates the bidirectional diagonals for the current cell
+
+    Args:
+        board (Board): State of the game
+
+    Returns:
+        tuple: Both bidirectional diagonals
+    """
+
+    right = []
+    left = []
+
+    for row in range(board.height):
+        right.append((row, row))
+        left.append((board.height - row - 1, row))
+
     return right, left
 
 
-def static_eval(row: str, col: str, right: str, left: str, x: int, y: int, player: str) -> int:
-    def get_static_index(line: str, default: int) -> int:
-        while default > 0 and line[default - 1] == player:
-            default -= 1
-        return default
+def evaluate(board: Board) -> int:
+    total = 0
+    for row in board:
+        for size in range(5):
+            score_me = row.count(ME * size) ** 2 if ENEMY + ME * size + ENEMY not in row else 0
+            score_enemy = row.count(ENEMY * size) ** 2 if ME + ENEMY * size + ME not in row else 0
+            total += score_me - score_enemy
 
-    def get_static_value_line(line: str, index: int) -> int:
-        length = 0
-        for i in line[index:]:
-            if i == player:
-                length += 1
-            else:
-                break
-        return length
+    for i in range(board.length):
+        col = "".join([row[i] for row in board])
+        for size in range(5):
+            score_me = col.count(ME * size) ** 2 if ENEMY + ME * size + ENEMY not in col else 0
+            score_enemy = col.count(ENEMY * size) ** 2 if ME + ENEMY * size + ME not in col else 0
+            total += score_me - score_enemy
 
-    def get_static_value_diag(line: str) -> int:
-        length = 0
-        for i in range(5):
-            if player * i in line:
-                length = i
-            else:
-                break
-        return length
+    right, left = generate_bidirectional_diags_coords(board)
 
-    row_index = get_static_index(row, x)
-    col_index = get_static_index(col, y)
-    return (get_static_value_line(row, row_index) + get_static_value_line(col, col_index) +
-            get_static_value_diag(right) + get_static_value_diag(left))
+    for cell in right:
+        diag = generate_left_diag(board, cell[0], cell[1])
+        for size in range(5):
+            score_me = diag.count(ME * size) ** 2 if ENEMY + ME * size + ENEMY not in diag else 0
+            score_enemy = diag.count(ENEMY * size) ** 2 if ME + ENEMY * size + ME not in diag else 0
+            total += score_me - score_enemy
+    for cell in left:
+        diag = generate_right_diag(board, cell[0], cell[1])
+        for size in range(5):
+            score_me = diag.count(ME * size) ** 2 if ENEMY + ME * size + ENEMY not in diag else 0
+            score_enemy = diag.count(ENEMY * size) ** 2 if ME + ENEMY * size + ME not in diag else 0
+            total += score_me - score_enemy
 
-
-def is_cell_in_pattern(pattern: str, board: Board, x: int, y: int, player: str) -> tuple:
-    """Checks if the given pattern figures in the board
-
-    Args:
-        pattern (str): Pattern as string
-        board (Board): Current state of the game
-        x (int): X coordinate of the cell
-        y (int): Y coordinate of the cell
-        player (str): Player that is being checked
-
-    Returns:
-        bool: True if pattern is in the board, False otherwise
-    """
-
-    if check_line(board[y], pattern):
-        return True, 0
-
-    col = "".join([row[x] for row in board.stones])
-    if check_line(col, pattern):
-        return True, 0
-
-    (right, left) = generate_bidirectional_diags(board, x, y)
-    if check_line(right, pattern) or check_line(left, pattern):
-        return True, 0
-    return False, static_eval(board[y], col, right, left, x, y, player)
-
-
-def evaluate(board: Board, player: str, x: int, y: int) -> int:
-    """Returns the value of a board for a player
-
-    Args:
-        board (Board): The state of the game
-        player (int): either ME or ENEMY (1 or 2)
-        x (int): X coordinate of the node
-        y (int) Y coordinate of the node
-
-    Returns:
-        int: The value of the given board for the given player
-    """
-    pattern_list.sort(key=lambda p: p["value"], reverse=True)
-    row = board[y]
-    row = row[x - 2 if x - 2 >= 0 else 0: x + 4 if x + 4 < len(row) else len(row) - 1]
-    col = "".join([row[x] for row in board.stones])
-    col = col[y - 2 if y - 2 >= 0 else 0: y + 4 if y + 4 < len(col) else len(col) - 1]
-    other_player = ME if player == ENEMY else ENEMY
-    (right, left) = generate_bidirectional_diags(board, x, y)
-    for pattern in pattern_list:
-        pattern_str = pattern["pattern"].replace("o", str(player)).replace("_", "0").replace("x", str(other_player))
-        if check_line(row, pattern_str) or check_line(col, pattern_str) or check_line(right, pattern_str) or \
-           check_line(left, pattern_str):
-            return pattern["value"]
-        rev_pattern = pattern_str[::-1]
-        if check_line(row, rev_pattern) or check_line(col, rev_pattern) or check_line(right, rev_pattern) or \
-           check_line(left, rev_pattern):
-            return pattern["value"]
-    return static_eval(row, col, right, left, 2, 2, player)
+    return total

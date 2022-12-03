@@ -129,7 +129,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
 
             next_moves = update_legal_moves(move[0], move[1], dup_board)
             res = minimax_recur(depth - 1, next_turn, next_moves, alphabeta) if depth != 0\
-                else evaluate(dup_board, player, move[0], move[1]) if player == ME else - evaluate(dup_board, player, move[0], move[1])
+                else evaluate(dup_board)
             if (player == ME and res >= alphabeta) \
                     or (player == ENEMY and res <= alphabeta):
                 alphabeta = res
