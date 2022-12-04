@@ -1,8 +1,7 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 from os import system
 
-name = "pbrain-gomoku-ai"
+NAME = "pbrain-gomoku-ai"
 
-system("pip install pyinstaller")
-system("pyinstaller %s --onefile --name %s.exe" % (name, name))
-system("cp ./dist/%s.exe ." % name)
+system(f"pyinstaller {NAME} --onefile --name {NAME}.exe")
+system(f"cp ./dist/{NAME}.exe .")
