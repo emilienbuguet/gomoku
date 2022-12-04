@@ -10,9 +10,20 @@ class Board:
     def __init__(self, length: int, height: int):
         self.length = int(length)
         self.height = int(height)
-        self.stones = [
+        self.stones_rows = [
             '0' * self.length for _ in range(0, self.height)
         ]
+        self.stones_cols = [
+            '0' * self.height for _ in range(0, self.length)
+        ]
+        self.left_diags = [
+            '0' * size for size in range(1, self.height + 1)
+        ]
+        self.left_diags += self.left_diags[-2::-1]
+        self.right_diags = [
+            '0' * size for size in range(1, self.height + 1)
+        ]
+        self.right_diags += self.right_diags[-2::-1]
 
     def __str__(self) -> str:
         result: str = ""
@@ -21,9 +32,9 @@ class Board:
             for j in range(0, self.length):
                 result += (
                     "_"
-                    if self.stones[i][j] == "0"
+                    if self.stones_rows[i][j] == "0"
                     else "1"
-                    if self.stones[i][j] == "1"
+                    if self.stones_rows[i][j] == "1"
                     else "2"
                 )
                 result += " "
@@ -31,10 +42,10 @@ class Board:
         return result
 
     def __getitem__(self, i: int) -> str:
-        return self.stones[i]
+        return self.stones_rows[i]
 
     def __setitem__(self, key, value):
-        self.stones[key] = value
+        self.stones_rows[key] = value
 
     def load(self, lines: list):
         """Loads a new board from a list of lines.
@@ -44,11 +55,31 @@ class Board:
         """
         for line in lines:
             [x_coordinate, y_coordinate, value] = line.split(",")
+            x_coordinate = int(x_coordinate)
+            y_coordinate = int(y_coordinate)
+            list_line = list(self.stones_rows[y_coordinate])
+            list_line[x_coordinate] = value
 
-            list_line = list(self.stones[int(y_coordinate)])
-            list_line[int(x_coordinate)] = value
+            self.stones_rows[y_coordinate] = ''.join(list_line)
 
-            self.stones[int(y_coordinate)] = ''.join(list_line)
+            col_list = list(self.stones_cols[x_coordinate])
+            col_list[y_coordinate] = value
+
+            self.stones_cols[x_coordinate] = ''.join(col_list)
+
+            left_list = list(self.left_diags[x_coordinate + y_coordinate])
+            if x_coordinate + y_coordinate <= self.length // 2:
+                left_list[x_coordinate] = value
+            else:
+                left_list[x_coordinate - (self.length - len(left_list))] = value
+            self.left_diags[x_coordinate + y_coordinate] = ''.join(left_list)
+
+            right_list = list(self.right_diags[self.height - 1 - x_coordinate + y_coordinate])
+            if x_coordinate < y_coordinate:
+                right_list[x_coordinate] = value
+            else:
+                right_list[y_coordinate] = value
+            self.right_diags[self.height - 1 - x_coordinate + y_coordinate] = ''.join(right_list)
 
     def add_stone(self, value: int, stone_x: int, stone_y: int):
         """Adds a new stone to the board.
@@ -65,9 +96,27 @@ class Board:
             or stone_y >= self.height
         ):
             raise ValueError(f"Out of bounds: ({stone_x}, {stone_y})")
-        line_list = list(self.stones[stone_y])
+        line_list = list(self.stones_rows[stone_y])
         line_list[stone_x] = value
-        self.stones[stone_y] = ''.join(line_list)
+        self.stones_rows[stone_y] = ''.join(line_list)
+
+        col_list = list(self.stones_cols[stone_x])
+        col_list[stone_y] = value
+        self.stones_cols[stone_x] = ''.join(col_list)
+
+        left_list = list(self.left_diags[stone_x + stone_y])
+        if stone_x + stone_y <= self.length // 2:
+            left_list[stone_x] = value
+        else:
+            left_list[stone_x - (self.length - len(left_list))] = value
+        self.left_diags[stone_x + stone_y] = ''.join(left_list)
+
+        right_list = list(self.right_diags[self.height - 1 - stone_x + stone_y])
+        if stone_x < stone_y:
+            right_list[stone_x] = value
+        else:
+            right_list[stone_y] = value
+        self.right_diags[self.height - 1 - stone_x + stone_y] = ''.join(right_list)
 
 
 class Game:
@@ -81,9 +130,9 @@ class Game:
         #    '5,16,2',
         #    '5,15,2',
         #    '5,13,2',
-        #   '4,17,2',
-        #  '6,17,1',
-        # '3,17,1',
+        #    '4,17,2',
+        #    '6,17,1',
+        #    '3,17,1',
         #    '6,15,1',
         #    '1,15,1',
         #    '0,14,1'

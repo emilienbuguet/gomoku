@@ -69,11 +69,11 @@ def has_won(board: Board, player: int) -> bool:
         return right, left
 
 
-    for row in board.stones:
+    for row in board:
         row_str = "".join(row)
         if str(player) * 5 in row_str:
             return True
-    cols = ["".join([row[x] for row in board.stones]) for x in range(board.length)]
+    cols = ["".join([row[x] for row in board]) for x in range(board.length)]
     for col in cols:
         col_str = "".join(col)
         if str(player) * 5 in col_str:

@@ -123,9 +123,7 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
         alphabeta = inf if player == ENEMY else -inf
 
         for move in legal_moves:
-            line_list: list = list(dup_board[move[1]])
-            line_list[move[0]] = player
-            dup_board[move[1]] = ''.join(line_list)
+            dup_board.add_stone(player, move[0], move[1])
 
             next_moves = update_legal_moves(move[0], move[1], dup_board)
             res = minimax_recur(depth - 1, next_turn, next_moves, alphabeta) if depth != 0\
@@ -135,31 +133,21 @@ def minimax(board: Board, begin_legal_moves: list) -> tuple:
                 alphabeta = res
             if (player == ME and alphabeta >= prev_alphabeta)\
                     or (player == ENEMY and alphabeta <= prev_alphabeta):
-                line_list: list = list(dup_board[move[1]])
-                line_list[move[0]] = '0'
-                dup_board[move[1]] = ''.join(line_list)
+                dup_board.add_stone('0', move[0], move[1])
                 break
 
-            line_list: list = list(dup_board[move[1]])
-            line_list[move[0]] = '0'
-            dup_board[move[1]] = ''.join(line_list)
+            dup_board.add_stone('0', move[0], move[1])
         return alphabeta
 
     best_move: tuple = begin_legal_moves[0]
     dup_board = deepcopy(board)
     alpha = -inf
     for begin in begin_legal_moves:
-        line: list = list(dup_board[begin[1]])
-        line[begin[0]] = ME
-        dup_board[begin[1]] = ''.join(line)
+        dup_board.add_stone(ME, begin[0], begin[1])
         dup_moves = update_legal_moves(begin[0], begin[1], board)
         score = minimax_recur(MAX_DEPTH, ENEMY, dup_moves, alpha)
-        print(f"MESSAGE Got {str(score)} for move {str(begin)}")
         if alpha <= score:
             alpha = score
             best_move = begin
-        line: list = list(dup_board[begin[1]])
-        line[begin[0]] = '0'
-        dup_board[begin[1]] = ''.join(line)
-    print("MESSAGE best move: %s with score %.2f" % (best_move, float(alpha)), flush=True)
+        dup_board.add_stone('0', begin[0], begin[1])
     return best_move

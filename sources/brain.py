@@ -32,5 +32,5 @@ def get_best_move(game: Game) -> tuple:
         return generate_random_coordinates(game.board.length, game.board.height)
     if len(legal_moves) == 1:
         return legal_moves[0]
-    print(game.board)
+
     return minimax(game.board, legal_moves)
