@@ -103,17 +103,6 @@ def update_legal_moves(x: int, y: int, board: Board) -> list:
         new_moves.append(move)
     return new_moves
 
-#
-# def downgrade_legal_moves(x: int, y: int, legal_moves: list):
-#     old_moves = [
-#         (x - 1, y - 1), (x, y - 1), (x + 1, y - 1),
-#         (x - 1, y), (x + 1, y),
-#         (x - 1, y + 1), (x, y + 1), (x + 1, y + 1),
-#     ]
-#     for move in old_moves:
-#         if move in legal_moves:
-#             del legal_moves[legal_moves.index(move)]
-
 
 def minimax(board: Board, begin_legal_moves: list) -> tuple:
     """Minimax algorithm main loop, returns the best move's coordinates"""

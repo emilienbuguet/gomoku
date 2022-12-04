@@ -3,15 +3,6 @@
 from .game import Board
 
 
-# def check_line(line: list, player: int) -> int:
-#     for i in range(len(line) - 4):
-#         own_stones: int = line[i : i + 5].count(player)
-#         free_stones: int = line[i : i + 5].count(0)
-#         if own_stones == 4 and free_stones == 1:
-#             return i + line[i : i + 5].index(0)
-#     return -1
-
-
 def need_to_check_diag(board: Board, node_x: int, node_y: int, player: int) -> bool:
     """Checks if diagonals have to be checked for the current cell
 
